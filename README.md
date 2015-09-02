@@ -1,18 +1,3 @@
-#Proyecto stub de Node.js y Express
+#Clase 3 - TP 1 - Ayudantes
 
-Para instalar la dependencia Express simplemente hacer
-
-```
-npm install
-```
-
-Para ejecutar hacer 
-
-```
-node app
-```
-
-La documentación sobre Express esta en este [link](http://expressjs.com/guide/routing.html). 
-
-
-Y para algo más detallado ver [acá](http://expressjs.com/4x/api.html)
+https://docs.google.com/document/d/1j7agLiiWzoOAY3cmF2uevn8fvyrG0oDm0SzBkQru6A4/pub

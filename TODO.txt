@@ -1,0 +1,5 @@
+- id del lado del servidor
+- dos endpoints para crear los alumnos y docentes
+- el ip lo tiene que rtener cada lista
+- en mandar mensaje callback de error y de ok
+- hasta el dos

@@ -1,7 +1,7 @@
 function Usuario(id, tipo, nombre) {
-  this._id = id;
-  this._tipo = tipo;
-  this._nombre = nombre;
+  this.id = id;
+  this.tipo = tipo;
+  this.nombre = nombre;
 }
 
 module.exports = Usuario;

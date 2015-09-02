@@ -1,8 +1,3 @@
-//==========
-//===EH LEE LA DOCUMENTACIÓN ACA=====
-//==http://expressjs.com/guide/routing.html===
-//==Para más detalles de la API MIRA ACA===
-//==http://expressjs.com/4x/api.html
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
@@ -29,9 +24,9 @@ app.post('/user', function (req, res) {
     var nombre = req.body.nombre;
     var user = new Usuario(id, type, nombre);
     registrados[id] = user;
-    if(type == "alumno"){
+    if(type.toLowerCase() == "alumno"){
       alumnos.agregar(user);
-    } else if ( type == "docente") {
+    } else if ( type.toLowerCase() == "docente") {
       docentes.agregar(user);
     }
     res.status(200);
@@ -63,11 +58,11 @@ app.get('/consultas', function (req, res) {
 });
 
 app.post('/responder', function (req, res) {
-  console.log(req.body);  
-  var docenteId = req.body.id;
-  var preguntaId = req.body.consulta;
-  var mensaje = new Message(id, consulta);
-  docentes.mandarMensaje(mensaje);
+  console.log("responder -> " + JSON.stringify(req.body));  
+  var docenteId = req.body.docente;
+  var consultaId = req.body.consulta;
+  var respuesta = req.body.respuesta;
+  // hacer respuesta
   res.status(200);
   res.send();
 });
