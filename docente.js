@@ -1,33 +1,48 @@
 var express = require('express');
 var request = require('request');
+var bodyParser = require('body-parser');
 var app = express();
+app.use(bodyParser.json());
 
-var profesores = [];
+var cantidadDocentes = 10;
+var APP_HOST = "localhost:3000";
 
-var server = app.listen(3000, function () {
-    
+var server = app.listen(3002, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+
+  console.log('Example app listening at http://%s:%s', host, port);
 });
 
-app.post('/notification', function (req, res) {
-
-});
-
-// registrar profesor
-setInterval(function () {
-  console.log("=====================================");
-  console.log("Registrando profesor");
-  var rand = Math.floor((Math.random() * 100) + 1);
-  while(profesores.indexOf(rand) !== -1) {
-    rand = Math.floor((Math.random() * 100) + 1);
+// registrar docentes
+var intervalId = setInterval(function () {
+  if(cantidadDocentes <= 0){
+    console.log("=====================================");
+    console.log("Registro finalizado");   
+    clearInterval(intervalId);
+    return;
   }
 
-  var profParams = { id: rand, nombre: 'profe' + rand, type: 'Docente' };
-  profesores.push(rand);
+  cantidadDocentes -= 1;
+  registrarDocente(function(id) {
+    app.post('/docentes/' + id + "/consultas", function (req, res) {
+      console.log("=====================================");
+      console.log("Docente " + id + " ha recibido la consulta: " + JSON.stringify(req.body));
+      res.status(200);
+      res.send();
+    });
+  });
+}, 10000);
+
+function registrarDocente(cont) {
+  console.log("=====================================");
+  console.log("Registrando docente");
+  var docente = { nombre: 'docente piola'};
 
   request({
-    url: "http://172.20.10.3:3000/user",
+    url: "http://" + APP_HOST + "/docentes",
     method: 'POST',
-    json: profParams,
+    json: docente,
     headers: {
       "Content-Type": "application/json"
     }
@@ -36,66 +51,7 @@ setInterval(function () {
       console.log(err);
       return;
     }
-    console.log("Response status de registrar profesor" + rand + ": " + response.statusCode);
-  });
-
-}, 5000);
-
-
-// get a consultas y responder una random
-setInterval(function () {
-  console.log("=====================================");
-  console.log("Trayendo las consultas");
-  request({
-    url: "http://172.20.10.3:3000/consultas",
-    method: 'GET'
-  }, function(err, response, body) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    
-    console.log("CONSULTAS:")
-    console.log(body);
-    
-    for (var consultaId in body) {
-      var profesorId = 1;
-      
-      var respuestaParams = {
-        respuesta: "veintisiete",
-        profesor: profesorId,
-        consulta: consultaId
-      };
-
-      console.log("=====================================");
-    console.log("Respondiendo la consulta " + consultaId);
-    request({
-      url: "http://172.20.10.3:3000/responder",
-      method: 'POST'
-    }, function(err, response, body) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log(body);
-    }); 
-    }
-  }); 
-}, 3000);
-
-
-// get a consultas y responder una random
-setInterval(function () {
-  console.log("=====================================");
-  console.log("Trayendo las consultas");
-  request({
-    url: "http://172.20.10.3:3000/consultas",
-    method: 'GET'
-  }, function(err, response, body) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    console.log(body);
-  }); 
-}, 3000);
+    console.log("Response de registrar docente " + JSON.stringify(response.body));
+    cont(response.body.id);
+  });  
+}
