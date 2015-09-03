@@ -53,7 +53,7 @@ Docente finaliza de escribir la respuesta
 Enviar una nueva consulta a el docente correspondiente
 ```json
 {
-  "id": 1234
+  "id": 1234,
   "descripcion": "what is the meaning of life the universe and everything?"
 }
 ```
@@ -83,7 +83,7 @@ Respuesta de una consulta de otro docente
 Enviar una nueva consulta a el docente correspondiente
 ```json
 {
-  "id": 1234
+  "id": 1234,
   "descripcion": "what is the meaning of life the universe and everything?"
 }
 ```
