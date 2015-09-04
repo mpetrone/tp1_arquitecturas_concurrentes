@@ -15,7 +15,7 @@ Registrar un nuevo docente
 }
 ```
 
-**POST** /alumnos
+**POST** /alumnos  
 Registrar un nuevo alumno
 ```json
 {
@@ -23,7 +23,7 @@ Registrar un nuevo alumno
 }
 ```
 
-**POST** alumnos/{alumno}/consultas
+**POST** alumnos/{alumno}/consultas  
 Registrar una nueva consulta
 ```json
 {
@@ -31,7 +31,7 @@ Registrar una nueva consulta
 }
 ```
 
-**POST** /docentes/{docente}/respuesta/start
+**POST** /docentes/{docente}/respuesta/start  
 Docente empieza a escribir una respuesta
 ```json
 {
@@ -39,7 +39,7 @@ Docente empieza a escribir una respuesta
 }
 ```
 
-**POST** /docentes/{docente}/respuesta/{respuests}/finish
+**POST** /docentes/{docente}/respuesta/{respuests}/finish  
 Docente finaliza de escribir la respuesta
 ```json
 {
@@ -49,7 +49,7 @@ Docente finaliza de escribir la respuesta
 
 ###Proceso docente
 
-**POST** /docentes/{docente}/consultas
+**POST** /docentes/{docente}/consultas  
 Enviar una nueva consulta a el docente correspondiente
 ```json
 {
@@ -58,7 +58,7 @@ Enviar una nueva consulta a el docente correspondiente
 }
 ```
 
-**POST** /doncentes/{docente}/respuesta/start
+**POST** /doncentes/{docente}/respuesta/start  
 Aviso de que otro docente empezo a escribir una respuesta
 ```json
 {
@@ -67,7 +67,7 @@ Aviso de que otro docente empezo a escribir una respuesta
 }
 ```
 
-**POST** /doncentes/{docente}/respuesta
+**POST** /doncentes/{docente}/respuesta  
 Respuesta de una consulta de otro docente
 ```json
 {
@@ -79,7 +79,7 @@ Respuesta de una consulta de otro docente
 
 ###Proceso alumno
  
-**POST** /alumnos/{alumno}/consultas 
+**POST** /alumnos/{alumno}/consultas  
 Enviar una nueva consulta a el docente correspondiente
 ```json
 {
