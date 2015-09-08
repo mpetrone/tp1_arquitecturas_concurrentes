@@ -6,7 +6,7 @@ app.use(bodyParser.json());
 
 var cantidadAlumnos = 10;
 var cantidadConsultas = 10;
-var APP_HOST = "localhost:3000";
+var APP_HOST = "localhost:3003";
 
 var server = app.listen(3001, function () {
   var host = server.address().address;

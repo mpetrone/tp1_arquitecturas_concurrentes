@@ -12,32 +12,39 @@ var alumnos = [];
 var docentes = [];
 var consultas = {};
 
-var server = app.listen(3000, function () {
+var server = app.listen(3003, function () {
   var host = server.address().address;
   var port = server.address().port;
   console.log('Servidor levantado en http://%s:%s', host, port);
 });
 
 app.post('/docentes', function (req, res) {
-  console.log("docentes -> " + JSON.stringify(req.body));
+  console.log("=====================================");
+  console.log("docentes creado -> " + JSON.stringify(req.body));
   if(!req.body.nombre) {
     res.status(401);
     res.send();   
   }
 
-  var id = docentes.length + 1
+  var docenteId = docentes.length + 1
   var nombre = req.body.nombre;
-  var docente = { "id": id, "nombre": nombre};
+  var docente = { "id": docenteId, "nombre": nombre};
   docentes.push(docente);
-  app.post('/docentes/' + id + '/respuesta/start', function (req, res) { 
-    console.log("docente " + id + " respuesta -> " + JSON.stringify(req.body));
+  app.post('/docentes/' + docenteId + '/respuesta/start', function (req, res) { 
+    console.log("=====================================");
+    console.log("docente " + docenteId + " empezo a escribir la respuesta para la consulta -> " + JSON.stringify(req.body));
+    docentes.forEach(function(otherDocente) {
+      var body = {"docente": otherDocente, "consulta": req.body.consulta}
+      makePost(body, "http://" + DOCENTES_HOST + "/docentes/" + otherDocente + "/respuesta/start ")
+    });
   });
   res.status(200);
   res.send(docente);
 });
 
 app.post('/alumnos', function (req, res) {
-  console.log("alumnos -> " + JSON.stringify(req.body));
+  console.log("=====================================");
+  console.log("alumnos creado -> " + JSON.stringify(req.body));
   if(!req.body.nombre) {
     res.status(401);
     res.send();   
@@ -48,15 +55,16 @@ app.post('/alumnos', function (req, res) {
   var alumno = { "id": alumnoId, "nombre": nombre};
   alumnos.push(alumno);
   app.post('/alumnos/' + alumnoId + '/consultas', function (req, res) { 
-    console.log("alumnos " + alumnoId + " consultas -> " + JSON.stringify(req.body));
+    console.log("=====================================");
+    console.log("el alumno " + alumnoId + " realizo la consulta -> " + JSON.stringify(req.body));
     var descripcion = req.body.descripcion;
     var consultaId = Math.floor((Math.random() * 1000000) + 1);
     var consulta = { "id": consultaId, "alumno": alumnoId,  "descripcion": descripcion};
     alumnos.forEach(function(alumno) {
-      enviarConsulta(consulta, "http://" + ALUMNOS_HOST + "/alumnos/" + alumno.id + "/consultas")
+      makePost(consulta, "http://" + ALUMNOS_HOST + "/alumnos/" + alumno.id + "/consultas")
     });
    docentes.forEach(function(docente) {
-      enviarConsulta(consulta, "http://" + DOCENTES_HOST + "/docentes/" + docente.id + "/consultas")
+      makePost(consulta, "http://" + DOCENTES_HOST + "/docentes/" + docente.id + "/consultas")
     });
     res.status(200);
     res.send(consulta);
@@ -65,7 +73,7 @@ app.post('/alumnos', function (req, res) {
   res.send(alumno);
 });
 
-function enviarConsulta(consulta, url) {
+function makePost(body, url) {
   request({
     url: url,
     method: 'POST',
@@ -78,7 +86,7 @@ function enviarConsulta(consulta, url) {
       console.log(err);
       return;
     } 
-    console.log("Response status de enviar consulta: " + response.statusCode + " and body: " + JSON.stringify(body));
+    console.log("Response status del post a " + url + ": " + response.statusCode + " and body: " + JSON.stringify(body));
   });   
 }
 

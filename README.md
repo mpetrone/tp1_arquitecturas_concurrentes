@@ -89,5 +89,5 @@ Enviar una nueva consulta a el docente correspondiente
 ```
 
 **POST** /alumnos/{alumno}/respuesta
-Respuesta de una consulta
+Respuesta de una consulta  
 *(igual a la misma api del docente)*
