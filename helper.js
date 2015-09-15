@@ -24,20 +24,7 @@ Helper.prototype = {
         "Content-Type": "application/json"
       }
     }, function(err, response, body) {
-      if (err) {
-        errHandler(err);
-      } else {
-        cont(response, body);
-      }
-    });    
-  },
-
-  makeGet: function(url, cont, errHandler) {
-     request({
-      url: url,
-      method: 'GET'
-    }, function(err, response, body) {
-      if (err) {
+      if (err || response.statusCode >= 400) {
         errHandler(err);
       } else {
         cont(response, body);

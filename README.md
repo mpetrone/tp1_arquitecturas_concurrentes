@@ -39,11 +39,12 @@ Docente empieza a escribir una respuesta
 }
 ```
 
-**POST** /docentes/{docente}/respuesta/{respuests}/finish  
+**POST** /docentes/{docente}/respuesta/finish  
 Docente finaliza de escribir la respuesta
 ```json
 {
-  "descripcion": "the answer is 42"
+  "consulta": 232524,
+  "respuesta": "the answer is 42"
 }
 ```
 
@@ -71,9 +72,8 @@ Aviso de que otro docente empezo a escribir una respuesta
 Respuesta de una consulta de otro docente
 ```json
 {
-  "respuesta": 154632,
   "consulta": 232524,
-  "descripcion": "the answer is 42"
+  "respuesta": "the answer is 42"
 }
 ```
 

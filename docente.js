@@ -5,7 +5,8 @@ var Helper = new HelperModule();
 var app = express();
 app.use(bodyParser.json());
 
-var cantidadDocentes = 2;
+var cantidadDocentes = 1;
+var cantidadDeIntentosDeRespuesta = 2;
 var APP_HOST = "localhost:3000";
 
 var server = app.listen(3002, function () {
@@ -30,7 +31,28 @@ Helper.correrNveces(function() {
       if(pos == -1){
         consultas.splice(pos, 1);
       }
-    }); 
+    });
+
+    // intenata n veces responder alguna consulta
+    Helper.correrNveces(function() {
+      if(consultas.length > 0) {
+        var consultaId = consultas.pop();
+        empezarResponderConsulta(docenteId, consultaId, function(response){
+          setTimeout(function() {
+            var respuesta = "respuesta piola";
+            finalizarRespuesta(docenteId, consultaId, respuesta, function(response){
+              console.log("el doncente " + docenteId + " finalizo de responder la consulta " + consultaId);
+            }, function(err) {
+              console.log("el doncente " + docenteId + " fallo al finalizar de responder la consulta " + consultaId);
+            })
+          }, 2000);
+        }, function(err){
+          console.log("el doncente " + docenteId + " quiso responder la consulta " + consultaId + " pero fallo: " + err);
+          consultas.push(consultaId);
+        });
+      }
+
+    }, cantidadDeIntentosDeRespuesta, 5000); 
   });
 }, cantidadDocentes, 10000);
 
@@ -48,22 +70,36 @@ function registrarDocente(cont) {
   }); 
 };
 
-function recibirConsultas(doncenteId, cont) {
-  app.post('/docentes/' + doncenteId + "/consultas", function (req, res) {
-    console.log("=====================================");
-    console.log("Docente " + doncenteId + " ha recibido la consulta: " + JSON.stringify(req.body));
+function recibirConsultas(docenteId, cont) {
+  app.post('/docentes/' + docenteId + "/consultas", function (req, res) {
+    console.log("Docente " + docenteId + " ha recibido la consulta: " + JSON.stringify(req.body));
     cont(req.body.consulta);
     res.status(200);
     res.send();
   });
 };
 
-function recibirStartRespuesta (doncenteId, cont) {
-  app.post('/docentes/' + doncenteId + "/respuesta/start", function (req, res) {
-    console.log("=====================================");
-    console.log("Docente " + doncenteId + " ha recibido la start respuesta: " + JSON.stringify(req.body));
+function recibirStartRespuesta(docenteId, cont) {
+  app.post('/docentes/' + docenteId + "/respuesta/start", function (req, res) {
+    console.log("Docente " + docenteId + " ha recibido la start respuesta: " + JSON.stringify(req.body));
     cont(req.body.docente, req.body.consulta);
     res.status(200);
     res.send();
   });
 };
+
+function empezarResponderConsulta(docenteId, consultaId, cont, err){
+  console.log("el doncente " + docenteId + " envio empezar respuesta de la consulta " + consultaId);
+  var url = "http://" + APP_HOST + '/docentes/' + docenteId + "/respuesta/start";
+  var consulta = { "consulta": consultaId }
+
+  Helper.makePost(consulta, url, function(response, body) { cont(response); }, err);
+}
+
+function finalizarRespuesta(docenteId, consultaId, respuesta, cont, err){
+  console.log("el doncente " + docenteId + " envio finalizar respuesta de la consulta " + consultaId);
+  var url = "http://" + APP_HOST + '/docentes/' + docenteId + "/respuesta/finish";
+  var body = { "respuesta": respuesta, "consulta": consultaId }
+
+  Helper.makePost(body, url, function(response, body) { cont(response); }, err); 
+}
