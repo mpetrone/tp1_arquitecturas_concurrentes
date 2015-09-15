@@ -35,12 +35,14 @@ function registrarAlumno(cont) {
   var alumno = { nombre: 'alumno piola'};
   var url = "http://" + APP_HOST + "/alumnos";
 
-  Helper.makePost(alumno, url, function(response, body) {
+  Helper.makePostPromise(alumno, url).then(function {
     console.log("Response status de registrar alumno: " + response.statusCode + " and body: " + JSON.stringify(body));
     cont(body.id);
-  }, function(err){
+  })
+  .catch(err){
     console.log("Hubo un error al registrar un alumno: " + err);
   }); 
+
 }
 
 function recibirConsultas(alumnoId, cont) {
@@ -68,12 +70,13 @@ function enviarConsultas(alumnoId, cont) {
     console.log("Enviando consulta del alumno " + alumnoId);
     consulta = { descripcion: "consulta piola"};
     var url = "http://" + APP_HOST + '/alumnos/' + alumnoId + "/consultas";
-
-    Helper.makePost(consulta, url, function(response, body) {
+    
+    Helper.makePostPromise(recibirConsultas, url).then(function {
       console.log("Response status de enviar consulta: " + response.statusCode + " and body: " + JSON.stringify(body));
       cont(body.consulta);
-    }, function(err){
+    })
+    .catch(err){
       console.log("Hubo un error al enviar la consulta del alumno " + alumnoId + ": " + err);
-    });       
+    });      
   }, cantidadConsultas, 10000);
 };
