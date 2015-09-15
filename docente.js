@@ -37,11 +37,11 @@ Helper.correrNveces(function() {
     Helper.correrNveces(function() {
       if(consultas.length > 0) {
         var consultaId = consultas.pop();
-        empezarResponderConsulta(docenteId, consultaId, function(response){
+        empezarResponderConsulta(docenteId, consultaId, function(){
           setTimeout(function() {
             var respuesta = "respuesta piola";
             finalizarRespuesta(docenteId, consultaId, respuesta, function(response){
-              console.log("el doncente " + docenteId + " finalizo de responder la consulta " + consultaId);
+              console.log("el doncente " + docenteId + " finalizo de responder la consulta " + consultaId + ": " + JSON.stringify(response));
             }, function(err) {
               console.log("el doncente " + docenteId + " fallo al finalizar de responder la consulta " + consultaId);
             })
@@ -92,7 +92,10 @@ function empezarResponderConsulta(docenteId, consultaId, cont, err){
   var url = "http://" + APP_HOST + '/docentes/' + docenteId + "/respuesta/start";
   var consulta = { "consulta": consultaId }
 
-  Helper.makePost(consulta, url, function(response, body) { cont(response); }, err);
+  Helper.makePost(consulta, url, function(response, body) {
+    console.log("respuesta de empezar a responder consulta: " + JSON.stringify(body))
+    cont(); 
+ }, err);
 }
 
 function finalizarRespuesta(docenteId, consultaId, respuesta, cont, err){
@@ -100,5 +103,5 @@ function finalizarRespuesta(docenteId, consultaId, respuesta, cont, err){
   var url = "http://" + APP_HOST + '/docentes/' + docenteId + "/respuesta/finish";
   var body = { "respuesta": respuesta, "consulta": consultaId }
 
-  Helper.makePost(body, url, function(response, body) { cont(response); }, err); 
+  Helper.makePost(body, url, function(response, body) { cont(body); }, err); 
 }
