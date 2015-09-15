@@ -60,14 +60,14 @@ app.post('/alumnos', function (req, res) {
 function enviarConsultaAlumno(alumnoId, consulta) {
   var url = "http://" + ALUMNOS_HOST + "/alumnos/" + alumnoId + "/consultas";
   Helper.makePost(consulta, url, function(response, body) {
-    console.log("Response status de enviar consulta al alumno: " + response.statusCode + " and body: " + JSON.stringify(body));    
+    console.log("Response status de enviar consulta al alumno: " + response.statusCode);    
   }, function(err){
     console.log("Hubo un error al enviar la consulta al alumno " + alumnoId + ": " + err);
   });
 }
 
 function enviarRespuestaAlumno(alumnoId, respuesta) {
-  var url = "http://" + ALUMNOS_HOST + "/alumno/" + alumnoId + "/respuesta";
+  var url = "http://" + ALUMNOS_HOST + "/alumnos/" + alumnoId + "/respuesta";
   Helper.makePost(respuesta, url, function(response, body) {
     console.log("Response de recibir respuesta: " + alumnoId + " and body: " + JSON.stringify(body));    
   }, function(err){
@@ -97,11 +97,6 @@ app.post('/docentes', function (req, res) {
     if(!consultas[consultaId].started){
       console.log("el docente " + docenteId + " trato de empezar a responder " + consultaId + " con exito");
       consultas[consultaId].started = true;
-      docentes.forEach(function(docente) {
-        if(docente.id != docenteId) {
-          enviarStartRespuesta(docente.id, {"docente": docenteId, "consulta": consultaId});   
-        } 
-      });
       recibirRespuesta(docenteId, function(response) {
         consultas[response.consulta].respuesta = response.respuesta;
         docentes.forEach(function(docente) {
@@ -114,6 +109,12 @@ app.post('/docentes', function (req, res) {
         });
       });
 
+      docentes.forEach(function(docente) {
+        if(docente.id != docenteId) {
+          enviarStartRespuesta(docente.id, {"docente": docenteId, "consulta": consultaId});   
+        } 
+      });
+
       res.status(200);
       res.send();
     } else {
@@ -121,12 +122,6 @@ app.post('/docentes', function (req, res) {
       res.status(401);
       res.send({error: true, causa: "already started"});
     }
-  });
-
-  app.post('/docentes/' + docenteId + '/respuesta/finish', function (req, res) { 
-
-    res.status(200);
-    res.send(docente);
   });
 
   res.status(200);
@@ -154,7 +149,7 @@ function enviarStartRespuesta(doncenteId, infoRespuesta) {
 
 function recibirRespuesta(docenteId, cont) {
   app.post('/docentes/' + docenteId + '/respuesta/finish', function (req, res) { 
-    console.log("el docente " + docenteId + "finalizo la respuesta: " + JSON.stringify(req.body));
+    console.log("el docente " + docenteId + " finalizo la respuesta: " + JSON.stringify(req.body));
     cont(req.body);
     res.status(200);
     res.send();    
