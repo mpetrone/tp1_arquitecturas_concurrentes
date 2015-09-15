@@ -32,7 +32,7 @@ Helper.prototype = {
         cont(response, body);
       }
     });    
-  }
+  },
 
   makePostPromise: function(body, url) {
     return request({
@@ -42,14 +42,12 @@ Helper.prototype = {
       headers: {
         "Content-Type": "application/json"
       }
-    }.then(function(response, body){
+    }).then(function(response, body){
       if(response.statusCode >= 400) {
         throw "Error al crear el post"
       }
-    })
+    });
   }
-
-
 }
 
 module.exports = Helper;
