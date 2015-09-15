@@ -58,7 +58,7 @@ Enviar una nueva consulta a el docente correspondiente
 }
 ```
 
-**POST** /doncentes/{docente}/respuesta/start  
+**POST** /docentes/{docente}/respuesta/start  
 Aviso de que otro docente empezo a escribir una respuesta
 ```json
 {
@@ -67,7 +67,7 @@ Aviso de que otro docente empezo a escribir una respuesta
 }
 ```
 
-**POST** /doncentes/{docente}/respuesta  
+**POST** /docentes/{docente}/respuesta  
 Respuesta de una consulta de otro docente
 ```json
 {
