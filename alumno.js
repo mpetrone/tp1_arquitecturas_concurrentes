@@ -34,9 +34,9 @@ function registrarAlumno(cont) {
   var alumno = { nombre: 'alumno piola'};
   var url = "http://" + APP_HOST + "/alumnos";
 
-  Helper.makePostPromise(alumno, url).then(function() {
-    console.log("Response status de registrar alumno: " + response.statusCode + " and body: " + JSON.stringify(body));
-    cont(body.id);
+  Helper.makePostPromise(alumno, url).then(function(response) {
+    console.log("Response status de registrar alumno: " + response.statusCode + " and body: " + JSON.stringify(response.body));
+    cont(response.body.id);
   }, function(err){
     console.log("Hubo un error al registrar un alumno: " + err);
   }); 
