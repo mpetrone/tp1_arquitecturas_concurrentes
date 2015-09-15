@@ -28,7 +28,7 @@ Helper.correrNveces(function() {
 
     recibirStartRespuesta(docenteId, function(doncenteRespondiendoId, consultaId) {
       var pos = consultas.indexOf(consultaId);
-      if(pos == -1){
+      if(pos != -1){
         consultas.splice(pos, 1);
       }
     });
@@ -48,7 +48,6 @@ Helper.correrNveces(function() {
           }, 2000);
         }, function(err){
           console.log("el doncente " + docenteId + " quiso responder la consulta " + consultaId + " pero fallo: " + err);
-          consultas.push(consultaId);
         });
       }
 
