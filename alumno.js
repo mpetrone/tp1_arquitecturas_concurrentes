@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var HelperModule = require("./helper");
 var Helper = new HelperModule();
+var Promise = require("bluebird");
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 

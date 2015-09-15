@@ -1,4 +1,5 @@
 //var request = require('request');
+var Promise = require("bluebird");
 var request = Promise.promisify(require("request"));
 
 function Helper(){
@@ -34,15 +35,17 @@ Helper.prototype = {
   }
 
   makePostPromise: function(body, url) {
-     request({
+    return request({
       url: url,
       method: 'POST',
       json: body,
       headers: {
         "Content-Type": "application/json"
       }
-    }.then(function(){
-      return request;
+    }.then(function(response, body){
+      if(response.statusCode >= 400) {
+        throw "Error al crear el post"
+      }
     })
   }
 
