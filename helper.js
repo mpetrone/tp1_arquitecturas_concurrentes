@@ -1,4 +1,5 @@
-var request = require('request');
+//var request = require('request');
+var request = Promise.promisify(require("request"));
 
 function Helper(){
 }
@@ -31,6 +32,21 @@ Helper.prototype = {
       }
     });    
   }
+
+  makePostPromise: function(body, url) {
+     request({
+      url: url,
+      method: 'POST',
+      json: body,
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }.then(function(){
+      return request;
+    })
+  }
+
+
 }
 
 module.exports = Helper;
