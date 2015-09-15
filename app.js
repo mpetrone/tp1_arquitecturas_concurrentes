@@ -5,7 +5,6 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-
 var ALUMNOS_HOST  = "localhost:3001";
 var DOCENTES_HOST = "localhost:3002";
 
@@ -34,12 +33,8 @@ app.post('/alumnos', function (req, res) {
   var alumno = { "id": alumnoId, "nombre": nombre};
   alumnos.push(alumno);
 
-  app.post('/alumnos/' + alumnoId + '/consultas', function (req, res) { 
-    console.log("=====================================");
-    console.log("el alumno " + alumnoId + " hizo una consulta -> " + JSON.stringify(req.body));
-    var descripcion = req.body.descripcion;
-    var consultaId = Math.floor((Math.random() * 1000000) + 1);
-    var consulta = { "consulta": consultaId, "alumno": alumnoId,  "descripcion": descripcion};
+
+  recibirConsulta(alumnoId, function(consultaId, consulta){
     consultas[consultaId] = consulta;
     alumnos.forEach(function(alumno) {
       if(alumno.id != alumnoId) {
@@ -49,8 +44,6 @@ app.post('/alumnos', function (req, res) {
     docentes.forEach(function(docente) {
       enviarConsultaDocente(docente.id, consulta);
     });
-    res.status(200);
-    res.send(consulta);
   });
 
   res.status(200);
@@ -66,10 +59,23 @@ function enviarConsultaAlumno(alumnoId, consulta) {
   });
 }
 
+function recibirConsulta(alumnoId, cont){
+  app.post('/alumnos/' + alumnoId + '/consultas', function (req, res) { 
+    console.log("=====================================");
+    console.log("el alumno " + alumnoId + " hizo una consulta -> " + JSON.stringify(req.body));
+    var descripcion = req.body.descripcion;
+    var consultaId = Math.floor((Math.random() * 1000000) + 1);
+    var consulta = { "consulta": consultaId, "alumno": alumnoId,  "descripcion": descripcion};
+    cont(consultaId, consulta);
+    res.status(200);
+    res.send(consulta);
+  });
+}
+
 function enviarRespuestaAlumno(alumnoId, respuesta) {
   var url = "http://" + ALUMNOS_HOST + "/alumnos/" + alumnoId + "/respuesta";
   Helper.makePost(respuesta, url, function(response, body) {
-    console.log("Response de recibir respuesta: " + alumnoId + " and body: " + JSON.stringify(body));    
+    console.log("Response de recibir respuesta: " + alumnoId);    
   }, function(err){
     console.log("Hubo un error al recibir respuesta de alumno " + alumnoId + ": " + err);
   });  
