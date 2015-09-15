@@ -11,10 +11,10 @@ Helper.prototype = {
       if(n <= 0){
         clearInterval(intervalId);
         return;
-      }    
+      }
       n -= 1;
       f();
-    }, delay);  
+    }, delay);
   },
 
   makePost: function(body, url, cont, errHandler) {
@@ -31,7 +31,7 @@ Helper.prototype = {
       } else {
         cont(response, body);
       }
-    });    
+    });
   },
 
   makePostPromise: function(body, url) {
@@ -42,10 +42,11 @@ Helper.prototype = {
       headers: {
         "Content-Type": "application/json"
       }
-    }).then(function(response, body){
+    }).then(function(response) {
       if(response.statusCode >= 400) {
         throw "Error al crear el post"
       }
+      return response[0];
     });
   }
 }
