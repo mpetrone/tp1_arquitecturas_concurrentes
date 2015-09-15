@@ -2,7 +2,6 @@ var express = require('express');
 var app = express();
 var HelperModule = require("./helper");
 var Helper = new HelperModule();
-var Promise = require("bluebird");
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
@@ -38,11 +37,9 @@ function registrarAlumno(cont) {
   Helper.makePostPromise(alumno, url).then(function() {
     console.log("Response status de registrar alumno: " + response.statusCode + " and body: " + JSON.stringify(body));
     cont(body.id);
-  })
-  .catch(err){
+  }, function(err){
     console.log("Hubo un error al registrar un alumno: " + err);
   }); 
-
 }
 
 function recibirConsultas(alumnoId, cont) {
@@ -70,13 +67,12 @@ function enviarConsultas(alumnoId, cont) {
     console.log("Enviando consulta del alumno " + alumnoId);
     consulta = { descripcion: "consulta piola"};
     var url = "http://" + APP_HOST + '/alumnos/' + alumnoId + "/consultas";
-    
-    Helper.makePostPromise(recibirConsultas, url).then(function {
+
+    Helper.makePost(consulta, url, function(response, body) {
       console.log("Response status de enviar consulta: " + response.statusCode + " and body: " + JSON.stringify(body));
       cont(body.consulta);
-    })
-    .catch(err){
+    }, function(err){
       console.log("Hubo un error al enviar la consulta del alumno " + alumnoId + ": " + err);
-    });      
+    });       
   }, cantidadConsultas, 10000);
 };
