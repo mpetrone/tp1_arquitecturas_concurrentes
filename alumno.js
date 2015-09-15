@@ -1,12 +1,13 @@
 var express = require('express');
 var app = express();
-var request = require('request');
+var HelperModule = require("./helper");
+var Helper = new HelperModule();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-var cantidadAlumnos = 10;
-var cantidadConsultas = 10;
-var APP_HOST = "localhost:3003";
+var cantidadAlumnos = 4;
+var cantidadConsultas = 2;
+var APP_HOST = "localhost:3000";
 
 var server = app.listen(3001, function () {
   var host = server.address().address;
@@ -16,7 +17,7 @@ var server = app.listen(3001, function () {
 });
 
 // registrar alumnos
-correrNveces(function() {
+Helper.correrNveces(function() {
   registrarAlumno(function(alumnoId) {
     recibirConsultas(alumnoId);
     enviarConsultas(alumnoId);
@@ -27,22 +28,14 @@ function registrarAlumno(cont) {
   console.log("=====================================");
   console.log("Registrando alumno");
   var alumno = { nombre: 'alumno piola'};
+  var url = "http://" + APP_HOST + "/alumnos";
 
-  request({
-    url: "http://" + APP_HOST + "/alumnos",
-    method: 'POST',
-    json: alumno,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }, function(err, response, body) {
-    if (err) {
-      console.log(err);
-      return;
-    }
+  Helper.makePost(alumno, url, function(response, body) {
     console.log("Response status de registrar alumno: " + response.statusCode + " and body: " + JSON.stringify(body));
     cont(body.id);
-  });  
+  }, function(err){
+    console.log("Hubo un error al registrar un alumno: " + err);
+  }); 
 }
 
 function recibirConsultas(alumnoId) {
@@ -55,35 +48,16 @@ function recibirConsultas(alumnoId) {
 }
 
 function enviarConsultas(alumnoId) {
-  correrNveces(function () {
+  Helper.correrNveces(function () {
     console.log("=====================================");
     console.log("Enviando consulta del alumno " + alumnoId);
     consulta = { descripcion: "consulta piola"};
+    var url = "http://" + APP_HOST + '/alumnos/' + alumnoId + "/consultas";
 
-    request({
-      url: "http://" + APP_HOST + '/alumnos/' + alumnoId + "/consultas",
-      method: 'POST',
-      json: consulta,
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }, function(err, response, body) {
-      if (err) {
-        console.log(err);
-        return;
-      }
+    Helper.makePost(consulta, url, function(response, body) {
       console.log("Response status de enviar consulta: " + response.statusCode + " and body: " + JSON.stringify(body));
-    });     
+    }, function(err){
+      console.log("Hubo un error al enviar la consulta del alumno " + alumnoId + ": " + err);
+    });       
   }, cantidadConsultas, 10000);
-}
-
-function correrNveces(f, n, delay) {
-  var intervalId = setInterval(function () {
-    if(n <= 0){
-      clearInterval(intervalId);
-      return;
-    }    
-    n -= 1;
-    f();
-  }, delay);  
-}
+};

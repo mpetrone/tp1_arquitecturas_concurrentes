@@ -1,11 +1,12 @@
 var express = require('express');
-var request = require('request');
 var bodyParser = require('body-parser');
+var HelperModule = require("./helper");
+var Helper = new HelperModule();
 var app = express();
 app.use(bodyParser.json());
 
-var cantidadDocentes = 10;
-var APP_HOST = "localhost:3003";
+var cantidadDocentes = 2;
+var APP_HOST = "localhost:3000";
 
 var server = app.listen(3002, function () {
   var host = server.address().address;
@@ -14,76 +15,55 @@ var server = app.listen(3002, function () {
   console.log('Example app listening at http://%s:%s', host, port);
 });
 
-// registrar docentes
-var intervalId = setInterval(function () {
-  if(cantidadDocentes <= 0){
-    console.log("=====================================");
-    console.log("Registro finalizado");   
-    clearInterval(intervalId);
-    return;
-  }
 
-  cantidadDocentes -= 1;
+// registrar docentes
+Helper.correrNveces(function() {
   registrarDocente(function(docenteId) {
-    // scope de un docente
     var consultas = [];
-    var consultasSiendoRespondidas = [];
 
     recibirConsultas(docenteId, function(consultaId) {
       consultas.push(consultaId);
     });
 
-    recibirComienzosDeRespuestas(docenteId, function(consultaId) {
+    recibirStartRespuesta(docenteId, function(doncenteRespondiendoId, consultaId) {
       var pos = consultas.indexOf(consultaId);
-      if(pos != -1) {
+      if(pos == -1){
         consultas.splice(pos, 1);
-        consultasSiendoRespondidas.push(consultaId);
-      } else {
-        console.log("se recibio que un docente empezo a responder una consulta que no se tenia :(")
       }
-    });
-
+    }); 
   });
-}, 10000);
+}, cantidadDocentes, 10000);
 
 function registrarDocente(cont) {
   console.log("=====================================");
   console.log("Registrando docente");
   var docente = { nombre: 'docente piola'};
+  var url = "http://" + APP_HOST + "/docentes";
 
-  request({
-    url: "http://" + APP_HOST + "/docentes",
-    method: 'POST',
-    json: docente,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }, function(err, response, body) {
-    if (err) {
-      console.log(err);
-      return;
-    }
+  Helper.makePost(docente, url, function(response, body) {
     console.log("Response de registrar docente " + JSON.stringify(response.body));
     cont(response.body.id);
-  });  
-}
+  }, function(err){
+    console.log("Hubo un error al registrar al docente: " + err);
+  }); 
+};
 
-function recibirComienzosDeRespuestas(docenteId, cont) {
-  app.post('/doncentes/' + docenteId + '/respuesta/start', function (req, res) {
+function recibirConsultas(doncenteId, cont) {
+  app.post('/docentes/' + doncenteId + "/consultas", function (req, res) {
     console.log("=====================================");
-    console.log("Docente " + docenteId + " ha recibido la notificacion de que una respuesta ha sido empezado a responderse: " + JSON.stringify(req.body));
-    cont(req.body.consulta)
+    console.log("Docente " + doncenteId + " ha recibido la consulta: " + JSON.stringify(req.body));
+    cont(req.body.consulta);
     res.status(200);
     res.send();
-  });    
-}
+  });
+};
 
-function recibirConsultas(docenteId, cont) {
-  app.post('/docentes/' + docenteId + "/consultas", function (req, res) {
+function recibirStartRespuesta (doncenteId, cont) {
+  app.post('/docentes/' + doncenteId + "/respuesta/start", function (req, res) {
     console.log("=====================================");
-    console.log("Docente " + docenteId + " ha recibido la consulta: " + JSON.stringify(req.body));
-    cont(req.body.id)
+    console.log("Docente " + doncenteId + " ha recibido la start respuesta: " + JSON.stringify(req.body));
+    cont(req.body.docente, req.body.consulta);
     res.status(200);
     res.send();
-  });  
-}
+  });
+};
