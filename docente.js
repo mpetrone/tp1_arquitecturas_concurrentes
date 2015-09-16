@@ -19,7 +19,7 @@ var server = app.listen(3002, function () {
 
 // registrar docentes
 Helper.correrNveces(function() {
-  registrarDocente(function(docenteId) {
+  registrarDocente().then(function(docenteId) {
     var consultas = [];
 
     recibirConsultas(docenteId, function(consultaId) {
@@ -37,7 +37,7 @@ Helper.correrNveces(function() {
     Helper.correrNveces(function() {
       if(consultas.length > 0) {
         var consultaId = consultas.pop();
-        empezarResponderConsulta(docenteId, consultaId, function(){
+        empezarResponderConsulta(docenteId, consultaId).then(function () {
           setTimeout(function() {
             var respuesta = "respuesta piola";
             finalizarRespuesta(docenteId, consultaId, respuesta, function(response){
@@ -55,16 +55,16 @@ Helper.correrNveces(function() {
   });
 }, cantidadDocentes, 10000);
 
-function registrarDocente(cont) {
+function registrarDocente() {
   console.log("=====================================");
   console.log("Registrando docente");
   var docente = { nombre: 'docente piola'};
   var url = "http://" + APP_HOST + "/docentes";
 
-  Helper.makePostPromise(docente, url).then( function(response) {
+  return Helper.makePostPromise(docente, url).then( function(response) {
     console.log("Response de registrar docente " + JSON.stringify(response.body));
-    cont(response.body.id);
-  }, function(err){
+    return response;
+  }, function(err) {
     console.log("Hubo un error al registrar al docente: " + err);
   });
 }
@@ -87,14 +87,14 @@ function recibirStartRespuesta(docenteId, cont) {
   });
 }
 
-function empezarResponderConsulta(docenteId, consultaId, cont, err){
+function empezarResponderConsulta(docenteId, consultaId) {
   console.log("el doncente " + docenteId + " envio empezar respuesta de la consulta " + consultaId);
   var url = "http://" + APP_HOST + '/docentes/' + docenteId + "/respuesta/start";
   var consulta = { "consulta": consultaId };
 
-  Helper.makePostPromise(consulta, url).then( function(response, body) {
+  return Helper.makePostPromise(consulta, url).then( function(response, body) {
     console.log("respuesta de empezar a responder consulta: " + JSON.stringify(body));
-    cont();
+    return response;
   }, err);
 }
 
