@@ -18,17 +18,24 @@ var server = app.listen(3001, function () {
 
 // registrar alumnos
 Helper.correrNveces(function() {
-  registrarAlumno(function(alumnoId) {
-    recibirConsultas(alumnoId, function(consultaId) {
-      recibirRespuesta(alumnoId, consultaId);
-    });
-    enviarConsultas(alumnoId, function(consultaId) {
-      recibirRespuesta(alumnoId, consultaId);
-    });
+  registrarAlumno().then(function(alumnoId){
+    recibirConsultas(alumnoId, recibirRespuesta(alumnoId));
+    enviarConsultas(alumnoId).then(recibirRespuesta(alumnoId));
   });
 }, cantidadAlumnos, 10000);
 
-function registrarAlumno(cont) {
+// Helper.correrNveces(function() {
+//   registrarAlumno().then(function(alumnoId) {
+//     recibirConsultas(alumnoId, function(consultaId) {
+//       recibirRespuesta(alumnoId, consultaId);
+//     });
+//     enviarConsultas(alumnoId, function(consultaId) {
+//       recibirRespuesta(alumnoId, consultaId);
+//     });
+//   });
+// }, cantidadAlumnos, 10000);
+
+function registrarAlumno() {
   console.log("=====================================");
   console.log("Registrando alumno");
   var alumno = { nombre: 'alumno piola'};
@@ -36,8 +43,9 @@ function registrarAlumno(cont) {
 
   Helper.makePostPromise(alumno, url).then(function(response) {
     console.log("Response status de registrar alumno: " + response.statusCode + " and body: " + JSON.stringify(response.body));
-    cont(response.body.id);
-  }, function(err){
+    return response.body.id;
+  })
+  .catch(function(err)){
     console.log("Hubo un error al registrar un alumno: " + err);
   }); 
 }
@@ -61,17 +69,18 @@ function recibirRespuesta(alumnoId, consultaId) {
   });  
 }
 
-function enviarConsultas(alumnoId, cont) {
+function enviarConsultas(alumnoId) {
   Helper.correrNveces(function () {
     console.log("=====================================");
     console.log("Enviando consulta del alumno " + alumnoId);
     consulta = { descripcion: "consulta piola"};
     var url = "http://" + APP_HOST + '/alumnos/' + alumnoId + "/consultas";
 
-    Helper.makePost(consulta, url, function(response, body) {
-      console.log("Response status de enviar consulta: " + response.statusCode + " and body: " + JSON.stringify(body));
-      cont(body.consulta);
-    }, function(err){
+    Helper.makePostPromise(consulta, url).then(function(response) {
+      console.log("Response status de enviar consulta: " + response.statusCode + " and body: " + JSON.stringify(response.body));
+      return response.body.consulta;
+    })
+    .catch(function(err){
       console.log("Hubo un error al enviar la consulta del alumno " + alumnoId + ": " + err);
     });       
   }, cantidadConsultas, 10000);
