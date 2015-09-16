@@ -52,9 +52,9 @@ app.post('/alumnos', function (req, res) {
 
 function enviarConsultaAlumno(alumnoId, consulta) {
   var url = "http://" + ALUMNOS_HOST + "/alumnos/" + alumnoId + "/consultas";
-  Helper.makePost(consulta, url, function(response, body) {
+  Helper.makePostPromise(consulta, url).then(function(response) {
     console.log("Response status de enviar consulta al alumno: " + response.statusCode);    
-  }, function(err){
+  }).catch(function(err){
     console.log("Hubo un error al enviar la consulta al alumno " + alumnoId + ": " + err);
   });
 }
@@ -74,9 +74,9 @@ function recibirConsulta(alumnoId, cont){
 
 function enviarRespuestaAlumno(alumnoId, respuesta) {
   var url = "http://" + ALUMNOS_HOST + "/alumnos/" + alumnoId + "/respuesta";
-  Helper.makePost(respuesta, url, function(response, body) {
+  Helper.makePostPromise(respuesta, url).then(function(response) {
     console.log("Response de recibir respuesta: " + alumnoId);    
-  }, function(err){
+  }).catch(function(err){
     console.log("Hubo un error al recibir respuesta de alumno " + alumnoId + ": " + err);
   });  
 }
@@ -137,18 +137,18 @@ app.post('/docentes', function (req, res) {
 
 function enviarConsultaDocente(doncenteId, consulta) {
   var url = "http://" + DOCENTES_HOST + "/docentes/" + doncenteId + "/consultas";
-  Helper.makePost(consulta, url, function(response, body) {
+  Helper.makePostPromise(consulta, url).then(function(response) {
     console.log("Response status de enviar consulta al docente: " + response.statusCode);    
-  }, function(err){
+  }).catch(function(err){
     console.log("Hubo un error al enviar la consulta al docente " + doncenteId + ": " + err);
   });
 }
 
 function enviarStartRespuesta(doncenteId, infoRespuesta) {
   var url = "http://" + DOCENTES_HOST + "/docentes/" + doncenteId + "/respuesta/start";
-  Helper.makePost(infoRespuesta, url, function(response, body) {
-    console.log("Response status de start respuesta al doncente: " + response.statusCode + " and body: " + JSON.stringify(body));    
-  }, function(err){
+  Helper.makePostPromise(infoRespuesta, url).then(function(response) {
+    console.log("Response status de start respuesta al doncente: " + response.statusCode + " and body: " + JSON.stringify(response.body));    
+  }).catch(function(err){
     console.log("Hubo un error al enviar la consulta al docente " + doncenteId + ": " + err);
   });
 }
@@ -164,9 +164,9 @@ function recibirRespuesta(docenteId, cont) {
 
 function enviarRespuestaDocente(docenteId, respuesta) {
   var url = "http://" + DOCENTES_HOST + "/docentes/" + docenteId + "/respuesta";
-  Helper.makePost(respuesta, url, function(response, body) {
-    console.log("Response de recibir respuesta docente: " + docenteId + " and body: " + JSON.stringify(body));    
-  }, function(err){
+  Helper.makePostPromise(respuesta, url).then(function(response) {
+    console.log("Response de recibir respuesta docente: " + docenteId + " and body: " + JSON.stringify(response.body));    
+  }).catch(function(err){
     console.log("Hubo un error al recibir respuesta de docente " + docenteId + ": " + err);
   });  
 }
